@@ -78,7 +78,7 @@ Die Wiederherstellung des Servers bspw. durch Ausfall aller Festplatten oder gen
 | Ansible Playbook | Luis
 | Minecraft & Pterodactyl Server aufgbauen | Robert
 | Backup & PXE Server aufbauen | Lugas
-| Dokumentation | Luis; Lucas; Robert
+| Dokumentation | Luis; Lugas; Robert
 
 # Zu befolgende Tutorials
 

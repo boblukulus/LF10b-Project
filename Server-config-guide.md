@@ -11,6 +11,12 @@ Setup Configuration {
     "Keyboard" : "German - German",
     "Install-Type": "Normal",
     "Search 3rd party driver": True,
+    "IP-Adress": {
+      "Subnet": "192.168.65.0/24",
+      "Adress": "192.168.65.161",
+      "Gateway": None,
+      "Name Server": None
+    },
     "Disk as LVM group" : False,
     "User" : {
         "Full Name" : "LF10b",
@@ -717,4 +723,3 @@ sudo docker run -d \
     -v /var/lib/pterodactyl/volumes/f2fdf9ed-7435-4d95-be54-bcbc32d94ad3/world:/world \
         heathcliff26/minecraft-exporter:latest
 ```
-
