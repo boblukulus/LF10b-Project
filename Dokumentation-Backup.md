@@ -40,5 +40,17 @@ Backupuser die Besitzerrechte des Ordners geben mit:
 Nun muss in die entsprechende Datei navigiert werden, um den Public-Key zu kopieren
 - ```cat ~/.ssh/id_ed25519.pub```
 - dort die Verschlüsselungsmethode und den Key kopieren und zwischenspeicher
+- der Kommentar am ende muss nicht mit kopiert werden
+
+Nun muss auf den Backupserver der Key vür den Backupuser hinterlegt werden:
+- dafür eine shell als backupuser öffnen mit: ```sudo -u backupuser -s```
+- nun ein directory anlegen mit: ```mkdir -p ~/.ssh```
+- nun eine Datei anlegen, in der der Key eingefügt werden muss: ```nano ~/.ssh/authorized_keys```
+
+Nun kann noch geprüft werden ob die SSH-verbindung mt dem Key funktioniert.
+Dafür auf dem Produktivserver per SSH als backupuser auf dem Backupserver verbinden:
+- ```ssh backupuser@10.42.0.30```
+- es darf kein passwort abgefragt werden, dann ist alles richtig eingerichtet
+
 
   
