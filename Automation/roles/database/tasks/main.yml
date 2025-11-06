@@ -1,0 +1,89 @@
+---
+
+- name: Sicherstellen das MariaDB installiert ist
+  ansible.builtin.package:
+    name: mariadb-server
+    state: present
+
+- name: Sicherstellen das MariaDB aktiv ist
+  ansible.builtin.service:
+    name: mariadb
+    enabled: true
+    state: started
+
+- name: Pterodactyl Datenbank erstellen
+  community.mysql.mysql_db:
+    name: "{{ pterodactyl_db_name }}"
+    state: present
+    login_user: root
+    login_password: "{{ mariadb_root_password }}"
+
+- name: Erstellen Pterodactyl Nutzer
+  community.mysql.mysql_user:
+    name: "{{ pterodactyl_db_name }}"
+    password: "{{ pterodactyl_db_password }}"
+    priv: '{{ pterodactyl_db_password }}.*:ALL'
+    host: "%"
+    state: present
+    login_user: root
+    login_password: "{{ mariadb_root_password }}"
+
+- name: Sicherstellen dass der Pterodactyl Nutzer sich mit dem localhost verbinden kann
+  community.mysql.mysql_user:
+    name: "{{ pterodactyl_db_name }}"
+    password: "{{ pterodactyl_db_password }}"
+    priv: '{{ pterodactyl_db_password }}.*:ALL'
+    host: "localhost"
+    state: present
+    login_user: root
+    login_password: "{{ mariadb_root_password }}"
+
+- name: Kopieren von Default Umgebungseinstellungen
+  ansible.builtin.copy:
+    src: /var/www/pterodactyl/.env.example
+    dest: /var/www/pterodactyl/.env
+    remote_src: yes
+
+- name: Installieren von Kern Abhängigkeiten
+  ansible.builtin.shell:
+    cmd: COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader
+    chdir: /var/www/pterodactyl
+
+- name: Generieren eines neuen App Key
+  ansible.builtin.shell:
+    cmd: php artisan key:generate --force
+    chdir: /var/www/pterodactyl
+
+- name: Einlesen von Daten aus der env Datei
+  ansible.builtin.slurp:
+    src: /var/www/pterodactyl/.env
+  register: source
+
+- name: Debug
+  ansible.builtin.debug:
+    msg: "{{ source.content | b64decode }}"
+
+- name: Extrahieren des Strings 
+  ansible.builtin.set_fact:
+    extracted_string: >
+      {{ source.content | b64decode | ansible.builtin.regex_search('?m)^APP_KEY=base64:[A-Za-z0-9+/=]+$') | default('FEHLER: APP_KEY NICHT GEFUNDEN') }}
+
+- name: String auf den Backup Server verschieben
+  ansible.builtin.lineinfile:
+    path: /home/luis/backup/key.txt     # Hier den korrekten Speicherort einfügen wo die Datei auf dem Backup Server gespeichert werden soll
+    line: "{{ extracted_string }}"
+    state: present
+    create: true
+  delegate_to: 192.168.0.43             # IP des Backup Server angeben
+  run_once: true                        # Stellt sicher dass die task nur einmal durchläuft
+
+- name: Kopieren der .env Datei
+  ansible.builtin.template:
+    src: pterodactyl.env.j2
+    dest: /var/www/pterodactyl/.env
+    mode: "0664"
+
+- name: App Key generieren 
+  command: php artisan key:generate --force
+  args: 
+    chdir: /var/www/pterodactyl
