@@ -20,9 +20,9 @@
 
 - name: Erstellen Pterodactyl Nutzer
   community.mysql.mysql_user:
-    name: "{{ pterodactyl.db_name }}"
-    password: "{{ pterodactyl.db_password }}"
-    priv: '{{ pterodactyl.db_password }}.*:ALL'
+    name: "{{ pterodactyl_env.db_username }}"
+    password: "{{ pterodactyl_env.db_password }}"
+    priv: '{{ pterodactyl_env.db_password }}.*:ALL'
     host: "%"
     state: present
     login_user: root
@@ -83,11 +83,13 @@
   ansible.builtin.command: php artisan migrate --seed --force
   args: 
     chdir: /var/www/pterodactyl
-    creates: /var/www/pterodactyl/database/.migrations_done
   register: migrate_result
+  changed_when: "'Nothing to migrate' not in migrate_result.stdout"
+  become: true
 
 - name: Erstellt Markerdatei
   ansible.builtin.file:
-    path: /var/www/pterodactyl/database/.migrations_done
+    path: /var/www/pterodactyl/.migrations_done
     state: touch
   when: migrate_result is changed
+  become: true
