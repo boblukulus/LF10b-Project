@@ -22,7 +22,7 @@
   community.mysql.mysql_user:
     name: "{{ pterodactyl_env.db_username }}"
     password: "{{ pterodactyl_env.db_password }}"
-    priv: '{{ pterodactyl_env.db_password }}.*:ALL'
+    priv: '{{ pterodactyl.db_name }}.*:ALL'
     host: "%"
     state: present
     login_user: root
@@ -32,17 +32,11 @@
   community.mysql.mysql_user:
     name: "{{ pterodactyl.db_name }}"
     password: "{{ pterodactyl.db_password }}"
-    priv: '{{ pterodactyl.db_password }}.*:ALL'
+    priv: '{{ pterodactyl.db_name }}.*:ALL'
     host: "localhost"
     state: present
     login_user: root
     login_password: "{{ pterodactyl.mariadb_root_password }}"
-
-- name: Kopieren von Default Umgebungseinstellungen
-  ansible.builtin.copy:
-    src: /var/www/pterodactyl/.env.example
-    dest: /var/www/pterodactyl/.env
-    remote_src: yes
 
 - name: Installieren von Kern Abhängigkeiten
   ansible.builtin.shell:
@@ -57,6 +51,7 @@
 
 - name: Prüfen ob der APP_KEY in .env existiert
   ansible.builtin.shell:
+    cmd: "grep -q '^APP_KEY=' /var/ww/pterodactyl/.env"
   register: app_key_check
   ignore_errors: true
 
@@ -85,11 +80,9 @@
     chdir: /var/www/pterodactyl
   register: migrate_result
   changed_when: "'Nothing to migrate' not in migrate_result.stdout"
-  become: true
 
 - name: Erstellt Markerdatei
   ansible.builtin.file:
     path: /var/www/pterodactyl/.migrations_done
     state: touch
   when: migrate_result is changed
-  become: true
