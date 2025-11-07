@@ -7,6 +7,7 @@
 
 - name: Download Pterodactyl
   ansible.builtin.unarchive:
-    url: https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz
+    src: https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz
     dest: /var/www/pterodactyl
+    remote_src: yes
     mode: '0775' 
