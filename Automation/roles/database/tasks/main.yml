@@ -99,11 +99,12 @@
   args:
     chdir: /var/www/pterodactyl
     creates: /var/www/pterodactyl/.admin_user_created
+  register: seeder_result
   become: true
 
 - name: Markerdatei für Admin Seeder erstellen
   ansible.builtin.file:
     path: /var/www/pterodactyl/.admin_user_created
     state: touch
-  when: result is changed
+  when: seeder_result.changed
   become: true

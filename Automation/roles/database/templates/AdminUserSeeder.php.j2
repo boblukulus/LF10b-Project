@@ -5,12 +5,13 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Pterodactyl\Models\User;
+use Illuminate\Support\Str;
 
 class AdminUserSeeder extends Seeder
 {
     public function run(): void
     {
-        $email = '{{ pterodactyl.admin_email }}';
+        $email = '{{ pterodactyl_user.admin_email }}';
 
         // Prüfen, ob der Benutzer bereits existiert
         if (User::where('email', $email)->exists()) {
@@ -20,12 +21,14 @@ class AdminUserSeeder extends Seeder
 
         // Benutzer erstellen
         User::create(array(
-            'username'   => '{{ pterodactyl.admin_username }}',
-            'email'      => '{{ pterodactyl.admin_email }}',
-            'name_first' => '{{ pterodactyl.admin_firstname }}',
-            'name_last'  => '{{ pterodactyl.admin_lastname }}',
-            'password'   => Hash::make('{{ pterodactyl.admin_password }}'),
+	    'uuid' 	 => (string) Str::uuid(),
+            'username'   => '{{ pterodactyl_user.admin_username }}',
+            'email'      => '{{ pterodactyl_user.admin_email }}',
+            'name_first' => '{{ pterodactyl_user.admin_firstname }}',
+            'name_last'  => '{{ pterodactyl_user.admin_lastname }}',
+            'password'   => Hash::make('{{ pterodactyl_user.admin_password }}'),
             'root_admin' => true,
+	    'language'	 => 'en',
         ));
 
         $this->command->info('Admin user created successfully.');
