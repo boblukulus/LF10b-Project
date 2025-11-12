@@ -8,7 +8,6 @@ pterodactyl_env:
   redis_port: "6379"
   enable_ui: "yes"
   telemetry: "no"
-  mail_username: "caldur33@gmail.com"
   db_host: "127.0.0.1"
   db_port: "3306"
   db_database: "panel"
