@@ -9,6 +9,7 @@
   ansible.builtin.unarchive:
     src: https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz
     dest: /var/www/pterodactyl
+    remote_src: yes
     mode: '0775' 
     remote_src: yes
 
