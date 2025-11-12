@@ -25,3 +25,10 @@ pterodactyl:
   db_name: "panel"
   db_password: "{{ encrypted_db_password }}"
   mariadb_root_password: "{{ encrypted_mariadb_root_password }}"
+
+pterodactyl_user:
+  admin_username: "admin"
+  admin_firstname: "Luis"
+  admin_lastname: "Rennert"
+  admin_email: "admin@minecraft.com"
+  admin_password: "superSicher123!"
