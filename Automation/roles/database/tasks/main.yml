@@ -108,3 +108,38 @@
     state: touch
   when: seeder_result.changed
   become: true
+
+- name: Korrekte Rechte einrichten für den Webserver
+  ansible.builtin.file:
+    path: /var/www/pterodactyl/
+    owner: www-data
+    state: directory
+    recurse: yes
+  become: true
+
+- name: Cronjob einrichten
+  ansible.builtin.cron:
+    name: "Pterodactyl Scheduler"
+    user: "root"
+    minute: "*"
+    hour: "*"
+    day: "*"
+    month: "*"
+    weekday: "*"
+    job: "usr/bin/php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1"
+    state: present
+
+- name: Queue Worker kopieren aus Templates
+  ansible.builtin.template:
+    src: pteroq.service
+    dest: /etc/systemd/system
+    mode: '0644'
+  become: true
+
+- name: Sicherstellen dass der Redis Server beim Boot startet
+  ansible.builtin.command: systemctl enable --now redis-server
+  become: true
+
+- name: Aktivieren des pteroq-service
+  ansible.builtin.command: systemctl enable --now pteroq.service
+  become: true
