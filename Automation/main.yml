@@ -11,3 +11,4 @@
     - role: common
     - role: dashboard
     - role: database
+    - role: webserver

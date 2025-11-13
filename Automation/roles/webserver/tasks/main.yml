@@ -1,0 +1,30 @@
+---
+
+- name: Entfernen der Default Apache Konfiguration
+  ansible.builtin.command: a2dissite 000-default.conf
+  become: true
+
+- name: Erstellen der pterodactyl config Datei
+  ansible.builtin.template:
+    src: pterodactyl.conf 
+    dest: /etc/apache2/sites-available
+    mode: '0644'
+  become: true 
+
+- name: System Link zur Aktivierung der Konfiguration
+  ansible.builtin.file:
+    src: /etc/aoache2/sites-available/pterodactyl.conf
+    dest: /etc/apache2/sites-enabled/pterodactyl.conf
+    state: link
+    owner: root
+    group: root
+
+- name: Aktualisieren der Konfiguration
+  ansible.builtin.apache2_module:
+    state: present
+    name: rewrite
+
+- name: Neustart Apache2
+  ansible.builtin.systemd_service:
+    name: apache2
+    state: restarted
