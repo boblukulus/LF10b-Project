@@ -13,7 +13,7 @@
 
 - name: System Link zur Aktivierung der Konfiguration
   ansible.builtin.file:
-    src: /etc/aoache2/sites-available/pterodactyl.conf
+    src: /etc/apache2/sites-available/pterodactyl.conf
     dest: /etc/apache2/sites-enabled/pterodactyl.conf
     state: link
     owner: root
@@ -23,8 +23,10 @@
   ansible.builtin.apache2_module:
     state: present
     name: rewrite
+  become: true
 
 - name: Neustart Apache2
   ansible.builtin.systemd_service:
     name: apache2
     state: restarted
+  become: true
