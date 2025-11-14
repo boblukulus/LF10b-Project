@@ -12,3 +12,4 @@
     - role: dashboard
     - role: database
     - role: webserver
+    - role: wings
