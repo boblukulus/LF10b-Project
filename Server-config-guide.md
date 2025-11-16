@@ -11,12 +11,6 @@ Setup Configuration {
     "Keyboard" : "German - German",
     "Install-Type": "Normal",
     "Search 3rd party driver": True,
-    "IP-Adress": {
-      "Subnet": "192.168.65.0/24",
-      "Adress": "192.168.65.161",
-      "Gateway": None,
-      "Name Server": None
-    },
     "Disk as LVM group" : False,
     "User" : {
         "Full Name" : "LF10b",
@@ -27,32 +21,6 @@ Setup Configuration {
     "Ubuntu Pro" : False,
     "OpenSSH Server" : True
 }
-```
-
-# Set static IPs
-
-```bash
-sudo nano /etc/netplan/50-cloud-init.yaml
-```
-
-```yaml
-network:
-  version: 2
-  ethernets:
-    ens160:
-      dhcp4: no
-      addresses:
-        - 192.168.65.161/24
-      nameservers:
-        addresses: [8.8.8.8, 8.8.4.4]
-    ens192:
-      dhcp4: true
-    ens224:
-      dhcp4: true
-```
-
-```bash
-sudo netplan apply
 ```
 
 # Ports used
@@ -153,8 +121,8 @@ sudo php artisan p:environment:database
 
 ```JSON
 Config {
-    "Author Mail" : "example@exchange.com",
-    "Application URL" : "http://192.168.65.161/panel",
+    "Author Mail" : "boblukulus@outlook.com",
+    "Application URL" : "http://10.42.0.101/panel",
     "Timezone": "UTC",
     "Cache Driver" : "redis",
     "Session Driver" : "redis",
@@ -333,7 +301,7 @@ NodeSettings {
     "Description" : "Minecraft Server Node",
     "Location" : "main-location",
     "Node Visibility" : "Public",
-    "FQDN" : "192.168.65.161",
+    "FQDN" : "10.42.0.101",
     "SSL" : False,
     "Behind Proxy": False,
     "Total Memory" : 4096,
@@ -362,15 +330,15 @@ api:
   port: 8080
   ssl:
     enabled: false
-    cert: /etc/letsencrypt/live/192.168.65.161/fullchain.pem
-    key: /etc/letsencrypt/live/192.168.65.161/privkey.pem
+    cert: /etc/letsencrypt/live/10.42.0.101/fullchain.pem
+    key: /etc/letsencrypt/live/10.42.0.101/privkey.pem
   upload_limit: 100
 system:
   data: /var/lib/pterodactyl/volumes
   sftp:
     bind_port: 2022
 allowed_mounts: []
-remote: 'http://192.168.65.161'
+remote: 'http://10.42.0.101'
 ```
 
 ### Start Wings
@@ -416,7 +384,7 @@ Nodes > minecraft > Allocation (Tab)
 To get all IPs from all Interfaces who are connected to Internet use `ip addr | grep "inet "`
 ```JSON
 AssignNewAllocation {
-    "IP Address" : "192.168.65.161",
+    "IP Address" : "10.42.0.101",
     "Ports" : "25565-25580" //Ports used by Minecraft
 }
 ```
@@ -440,12 +408,12 @@ ServerProperties{
     },
     AllocationManagement {
         "Node" : "minecraft",
-        "Default Allocation" : "192.168.65.161:25565"
+        "Default Allocation" : "10.42.0.101:25565"
     },
     ApplicationFeatureLimits {
         "Data Limit" : 0,
         "Allocation Limit": 0,
-        "Backup Limit" : 3
+        "Backup Limit" : 69
     },
     RessourceManagement {
         "CPU Limit" : 0, //Unlimited
@@ -703,7 +671,7 @@ drwx------ 4 root root  4096 Aug 29 18:25 volumes
 -rw-r--r-- 1 root root 16384 Sep 24 10:08 wings.db
 lf10b@main:~$ sudo docker ps -a
 CONTAINER ID   IMAGE                                    COMMAND                  CREATED          STATUS                    PORTS                                                              NAMES
-6fef2fe7c63c   ghcr.io/pterodactyl/yolks:java_21        "/__cacert_entrypoin…"   36 minutes ago   Up 36 minutes             192.168.65.161:25565->25565/tcp, 192.168.65.161:25565->25565/udp   f2fdf9ed-7435-4d95-be54-bcbc32d94ad3
+6fef2fe7c63c   ghcr.io/pterodactyl/yolks:java_21        "/__cacert_entrypoin…"   36 minutes ago   Up 36 minutes             10.42.0.101:25565->25565/tcp, 192.168.65.161:25565->25565/udp   f2fdf9ed-7435-4d95-be54-bcbc32d94ad3
 e94658b2f6a9   heathcliff26/minecraft-exporter:latest   "/minecraft-exporter"    23 hours ago     Exited (1) 23 hours ago                                                                      minecraft-exporter
 ```
 
