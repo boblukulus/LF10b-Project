@@ -38,6 +38,15 @@
     login_user: root
     login_password: "{{ pterodactyl.mariadb_root_password }}"
 
+- name: Korrekte Rechte einrichten für den Webserver
+  ansible.builtin.file:
+    path: /var/www/pterodactyl/
+    owner: www-data
+    group: www-data
+    state: directory
+    recurse: yes
+  become: true
+
 - name: Installieren von Kern Abhängigkeiten
   ansible.builtin.shell:
     cmd: COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader
@@ -100,15 +109,6 @@
     chdir: /var/www/pterodactyl
   become: true
 
-- name: Korrekte Rechte einrichten für den Webserver
-  ansible.builtin.file:
-    path: /var/www/pterodactyl/
-    owner: www-data
-    group: www-data
-    state: directory
-    recurse: yes
-  become: true
-
 - name: Cronjob einrichten
   ansible.builtin.cron:
     name: "Pterodactyl Scheduler"
@@ -134,4 +134,13 @@
 
 - name: Aktivieren des pteroq-service
   ansible.builtin.command: systemctl enable --now pteroq.service
+  become: true
+
+- name: Korrekte Rechte einrichten für den Webserver
+  ansible.builtin.file:
+    path: /var/www/pterodactyl/
+    owner: www-data
+    group: www-data
+    state: directory
+    recurse: yes
   become: true
