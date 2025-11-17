@@ -71,8 +71,8 @@
     line: "{{ app_key_output.stdout }}"
     state: present
     create: true
-  delegate_to: 192.168.0.43             # IP des Backup Server angeben
-  run_once: true                        # Stellt sicher dass die task nur einmal durchläuft
+  delegate_to: "{{ ansible_host }}"             # IP des Backup Server angeben
+  run_once: true                                                    # Stellt sicher dass die task nur einmal durchläuft
 
 - name: Datenbank Migration und Seed
   ansible.builtin.command: php artisan migrate --seed --force
