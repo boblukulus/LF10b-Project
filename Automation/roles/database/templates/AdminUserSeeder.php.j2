@@ -1,5 +1,3 @@
-<?php
-
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
@@ -12,24 +10,35 @@ class AdminUserSeeder extends Seeder
     public function run(): void
     {
         $email = '{{ pterodactyl_user.admin_email }}';
+        $password = '{{ pterodactyl_user.admin_password }}';
 
-        // Prüfen, ob der Benutzer bereits existiert
-        if (User::where('email', $email)->exists()) {
-            $this->command->info("Admin user with email {$email} already exists.");
+        $admin = User::where('email', $email)->first();
+
+        if ($admin) {
+            // Passwort und ggf. andere Daten aktualisieren
+            $admin->update([
+                'username'   => '{{ pterodactyl_user.admin_username }}',
+                'name_first' => '{{ pterodactyl_user.admin_firstname }}',
+                'name_last'  => '{{ pterodactyl_user.admin_lastname }}',
+                'password'   => Hash::make($password),
+                'root_admin' => true,
+            ]);
+
+            $this->command->info("Admin user with email {$email} updated successfully.");
             return;
         }
 
-        // Benutzer erstellen
-        User::create(array(
-	    'uuid' 	 => (string) Str::uuid(),
+        // Benutzer erstellen, falls noch nicht vorhanden
+        User::create([
+            'uuid'       => (string) Str::uuid(),
             'username'   => '{{ pterodactyl_user.admin_username }}',
-            'email'      => '{{ pterodactyl_user.admin_email }}',
+            'email'      => $email,
             'name_first' => '{{ pterodactyl_user.admin_firstname }}',
             'name_last'  => '{{ pterodactyl_user.admin_lastname }}',
-            'password'   => Hash::make('{{ pterodactyl_user.admin_password }}'),
+            'password'   => Hash::make($password),
             'root_admin' => true,
-	    'language'	 => 'en',
-        ));
+            'language'   => 'en',
+        ]);
 
         $this->command->info('Admin user created successfully.');
     }
