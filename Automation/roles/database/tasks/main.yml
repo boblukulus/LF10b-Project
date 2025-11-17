@@ -98,15 +98,6 @@
   ansible.builtin.command: php artisan db:seed --class=AdminUserSeeder --force
   args:
     chdir: /var/www/pterodactyl
-    creates: /var/www/pterodactyl/.admin_user_created
-  register: seeder_result
-  become: true
-
-- name: Markerdatei für Admin Seeder erstellen
-  ansible.builtin.file:
-    path: /var/www/pterodactyl/.admin_user_created
-    state: touch
-  when: seeder_result.changed
   become: true
 
 - name: Korrekte Rechte einrichten für den Webserver
