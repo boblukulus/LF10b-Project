@@ -65,3 +65,7 @@ To list all backups:
 `borg list backupuser@192.168.65.169:/BACKUP`
 
 ## Restore backup
+```bash
+cd /
+sudo borg extract --progress --verbose backupuser@192.168.65.169:/BACKUP::test001 /
+```
