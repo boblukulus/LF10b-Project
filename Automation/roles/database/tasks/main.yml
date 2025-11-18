@@ -101,7 +101,7 @@
     login_user: root
     login_password: "{{ pterodactyl.mariadb_root_password }}"
     query: "DELETE FROM users WHERE username = '{{ pterodactyl_user.admin_username }}';"
-    db: "{{ pterodactyl.db_name }}"
+    login_db: "{{ pterodactyl.db_name }}"
   ignore_errors: true
 
 - name: Admin Benutzer über Artisan anlegen
