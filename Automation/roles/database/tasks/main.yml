@@ -18,25 +18,34 @@
     login_user: root
     login_password: "{{ pterodactyl.mariadb_root_password }}"
 
-- name: Erstellen Pterodactyl Nutzer
+- name: Pterodactyl DB Benutzer für '%' anlegen
   community.mysql.mysql_user:
     name: "{{ pterodactyl_env.db_username }}"
     password: "{{ pterodactyl_env.db_password }}"
-    priv: '{{ pterodactyl.db_name }}.*:ALL'
+    priv: "{{ pterodactyl.db_name }}.*:ALL"
     host: "%"
     state: present
     login_user: root
     login_password: "{{ pterodactyl.mariadb_root_password }}"
 
-- name: Sicherstellen dass der Pterodactyl Nutzer sich mit dem localhost verbinden kann
+- name: Pterodactyl DB Benutzer für localhost anlegen
   community.mysql.mysql_user:
-    name: "{{ pterodactyl.db_name }}"
-    password: "{{ pterodactyl.db_password }}"
-    priv: '{{ pterodactyl.db_name }}.*:ALL'
+    name: "{{ pterodactyl_env.db_username }}"
+    password: "{{ pterodactyl_env.db_password }}"
+    priv: "{{ pterodactyl.db_name }}.*:ALL"
     host: "localhost"
     state: present
     login_user: root
     login_password: "{{ pterodactyl.mariadb_root_password }}"
+
+- name: Korrekte Rechte einrichten für den Webserver
+  ansible.builtin.file:
+    path: /var/www/pterodactyl/
+    owner: www-data
+    group: www-data
+    state: directory
+    recurse: yes
+  become: true
 
 - name: Installieren von Kern Abhängigkeiten
   ansible.builtin.shell:
@@ -71,8 +80,8 @@
     line: "{{ app_key_output.stdout }}"
     state: present
     create: true
-  delegate_to: 192.168.0.43             # IP des Backup Server angeben
-  run_once: true                        # Stellt sicher dass die task nur einmal durchläuft
+  delegate_to: "{{ ansible_host }}"             # IP des Backup Server angeben
+  run_once: true                                # Stellt sicher dass die task nur einmal durchläuft
 
 - name: Datenbank Migration und Seed
   ansible.builtin.command: php artisan migrate --seed --force
@@ -87,24 +96,59 @@
     state: touch
   when: migrate_result is changed
 
-- name: Kopiere AdminUserSeeder
+- name: Entferne vorhandenen Admin Benutzer direkt aus der Datenbank
+  community.mysql.mysql_query:
+    login_user: root
+    login_password: "{{ pterodactyl.mariadb_root_password }}"
+    query: "DELETE FROM users WHERE username = '{{ pterodactyl_user.admin_username }}';"
+    login_db: "{{ pterodactyl.db_name }}"
+  ignore_errors: true
+
+- name: Admin Benutzer über Artisan anlegen
+  ansible.builtin.shell: >
+    php artisan p:user:make
+    --email="{{ pterodactyl_user.admin_email }}"
+    --username="{{ pterodactyl_user.admin_username }}"
+    --name-first="{{ pterodactyl_user.admin_firstname }}"
+    --name-last="{{ pterodactyl_user.admin_lastname }}"
+    --password="{{ pterodactyl_user.admin_password }}"
+    --admin=1
+  args:
+    chdir: /var/www/pterodactyl
+  become: true
+
+- name: Cronjob einrichten
+  ansible.builtin.cron:
+    name: "Pterodactyl Scheduler"
+    user: "root"
+    minute: "*"
+    hour: "*"
+    day: "*"
+    month: "*"
+    weekday: "*"
+    job: "usr/bin/php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1"
+    state: present
+
+- name: Queue Worker kopieren aus Templates
   ansible.builtin.template:
-    src: AdminUserSeeder.php.j2
-    dest: /var/www/pterodactyl/database/Seeders/AdminUserSeeder.php
+    src: pteroq.service
+    dest: /etc/systemd/system
     mode: '0644'
   become: true
 
-- name: AdminUserSeeder ausführen
-  ansible.builtin.command: php artisan db:seed --class=AdminUserSeeder --force
-  args:
-    chdir: /var/www/pterodactyl
-    creates: /var/www/pterodactyl/.admin_user_created
-  register: seeder_result
+- name: Sicherstellen dass der Redis Server beim Boot startet
+  ansible.builtin.command: systemctl enable --now redis-server
   become: true
 
-- name: Markerdatei für Admin Seeder erstellen
+- name: Aktivieren des pteroq-service
+  ansible.builtin.command: systemctl enable --now pteroq.service
+  become: true
+
+- name: Korrekte Rechte einrichten für den Webserver
   ansible.builtin.file:
-    path: /var/www/pterodactyl/.admin_user_created
-    state: touch
-  when: seeder_result.changed
+    path: /var/www/pterodactyl/
+    owner: www-data
+    group: www-data
+    state: directory
+    recurse: yes
   become: true

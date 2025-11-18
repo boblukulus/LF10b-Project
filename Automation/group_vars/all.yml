@@ -1,5 +1,5 @@
 pterodactyl_env:
-  app_url: "http://192.168.65.161/panel"
+  app_url: "http://192.168.0.43/panel"
   app_timezone: "UTC"
   cache_driver: "redis"
   session_driver: "redis"
