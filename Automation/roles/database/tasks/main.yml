@@ -81,14 +81,7 @@
     state: present
     create: true
   delegate_to: "{{ ansible_host }}"             # IP des Backup Server angeben
-  run_once: true                                                    # Stellt sicher dass die task nur einmal durchläuft
-
-- name: Kopiere AdminUserSeeder
-  ansible.builtin.template:
-    src: AdminUserSeeder.php.j2
-    dest: /var/www/pterodactyl/database/Seeders/AdminUserSeeder.php
-    mode: '0644'
-  become: true
+  run_once: true                                # Stellt sicher dass die task nur einmal durchläuft
 
 - name: Datenbank Migration und Seed
   ansible.builtin.command: php artisan migrate --seed --force
@@ -103,11 +96,12 @@
     state: touch
   when: migrate_result is changed
 
-- name: AdminUserSeeder ausführen
-  ansible.builtin.command: php artisan db:seed --class=AdminUserSeeder --force
-  args:
-    chdir: /var/www/pterodactyl
-  become: true
+- name: Admin User erstellen
+  ansible.builtin.shell: >
+    php artisan p:user:make
+    --email="{{ pterodactyl_user.admin_email }}"
+    --username="{{ pterodactyl_user.admin_username }}"
+    --name-first="{{ 
 
 - name: Cronjob einrichten
   ansible.builtin.cron:
