@@ -36,4 +36,8 @@ sudo apt install openssh-server
 ```
 ## 3. Schritt Ansible-Skript für die Einrichtung
 
-## 
+## 4. Schritt EInrichten / installieren von Monitoring
+### Es muss nun Graphana und Prometheus installiert werden
+### Link zum [Installationsguide](https://github.com/Lucsifer/LF10b-Project/blob/main/Server-config-guide.md#monitoring-23-sept-2025)
+
+
