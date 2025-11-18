@@ -96,6 +96,14 @@
     state: touch
   when: migrate_result is changed
 
+- name: Alten Admin löschen falls vorhanden
+  ansible.builtin.shell: >
+    php artisan p:user:delete --email="{{ pterodactyl_user.admin_email }}"
+  args:
+    chdir: /var/www/pterodactyl
+  ignore_errors: true
+  become: true
+
 - name: Admin Benutzer über Artisan anlegen
   ansible.builtin.shell: >
     php artisan p:user:make
