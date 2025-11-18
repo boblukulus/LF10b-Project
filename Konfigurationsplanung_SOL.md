@@ -78,7 +78,7 @@ Die Wiederherstellung des Servers bspw. durch Ausfall aller Festplatten oder gen
 | Ansible Playbook | Luis
 | Minecraft & Pterodactyl Server aufgbauen | Robert
 | Backup & PXE Server aufbauen | Lugas
-| Dokumentation | Luis; Lucas; Robert
+| Dokumentation | Luis; Lugas; Robert
 
 # Zu befolgende Tutorials
 
@@ -95,6 +95,7 @@ Die Wiederherstellung des Servers bspw. durch Ausfall aller Festplatten oder gen
 
 ### Backups
 *   **Borg Backup (German Tutorial)** https://de.linux-terminal.com/?p=4514
+*   **How to user BorgBackup over your network (by Jack Wallen)**https://www.techrepublic.com/article/how-to-use-borgbackup-over-your-network/
 
 ### Automation & Security
 *   **Ansible Getting Started (Official Docs):** https://docs.ansible.com/ansible/latest/user_guide/index.html

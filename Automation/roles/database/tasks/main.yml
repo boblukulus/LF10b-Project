@@ -1,0 +1,110 @@
+---
+
+- name: Sicherstellen das MariaDB installiert ist
+  ansible.builtin.package:
+    name: mariadb-server
+    state: present
+
+- name: Sicherstellen das MariaDB aktiv ist
+  ansible.builtin.service:
+    name: mariadb
+    enabled: true
+    state: started
+
+- name: Pterodactyl Datenbank erstellen
+  community.mysql.mysql_db:
+    name: "{{ pterodactyl.db_name }}"
+    state: present
+    login_user: root
+    login_password: "{{ pterodactyl.mariadb_root_password }}"
+
+- name: Erstellen Pterodactyl Nutzer
+  community.mysql.mysql_user:
+    name: "{{ pterodactyl_env.db_username }}"
+    password: "{{ pterodactyl_env.db_password }}"
+    priv: '{{ pterodactyl.db_name }}.*:ALL'
+    host: "%"
+    state: present
+    login_user: root
+    login_password: "{{ pterodactyl.mariadb_root_password }}"
+
+- name: Sicherstellen dass der Pterodactyl Nutzer sich mit dem localhost verbinden kann
+  community.mysql.mysql_user:
+    name: "{{ pterodactyl.db_name }}"
+    password: "{{ pterodactyl.db_password }}"
+    priv: '{{ pterodactyl.db_name }}.*:ALL'
+    host: "localhost"
+    state: present
+    login_user: root
+    login_password: "{{ pterodactyl.mariadb_root_password }}"
+
+- name: Installieren von Kern Abhängigkeiten
+  ansible.builtin.shell:
+    cmd: COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader
+    chdir: /var/www/pterodactyl
+
+- name: Kopieren der .env Datei
+  ansible.builtin.template:
+    src: pterodactyl.env.j2
+    dest: /var/www/pterodactyl/.env
+    mode: "0664"
+
+- name: Prüfen ob der APP_KEY in .env existiert
+  ansible.builtin.shell:
+    cmd: "grep -q '^APP_KEY=' /var/ww/pterodactyl/.env"
+  register: app_key_check
+  ignore_errors: true
+
+- name: Generieren eines neuen App Key
+  ansible.builtin.shell:
+    cmd: php artisan key:generate --force
+    chdir: /var/www/pterodactyl
+  when: app_key_check.rc != 0
+
+- name: Einlesen des App Key aus der .env file
+  ansible.builtin.shell: "grep -oP '(?<=^APP_KEY=).*' /var/www/pterodactyl/.env"
+  register: app_key_output
+
+- name: String auf den Backup Server verschieben
+  ansible.builtin.lineinfile:
+    path: /home/luis/backup/key.txt     # Hier den korrekten Speicherort einfügen wo die Datei auf dem Backup Server gespeichert werden soll
+    line: "{{ app_key_output.stdout }}"
+    state: present
+    create: true
+  delegate_to: 192.168.0.43             # IP des Backup Server angeben
+  run_once: true                        # Stellt sicher dass die task nur einmal durchläuft
+
+- name: Datenbank Migration und Seed
+  ansible.builtin.command: php artisan migrate --seed --force
+  args: 
+    chdir: /var/www/pterodactyl
+  register: migrate_result
+  changed_when: "'Nothing to migrate' not in migrate_result.stdout"
+
+- name: Erstellt Markerdatei
+  ansible.builtin.file:
+    path: /var/www/pterodactyl/.migrations_done
+    state: touch
+  when: migrate_result is changed
+
+- name: Kopiere AdminUserSeeder
+  ansible.builtin.template:
+    src: AdminUserSeeder.php.j2
+    dest: /var/www/pterodactyl/database/Seeders/AdminUserSeeder.php
+    mode: '0644'
+  become: true
+
+- name: AdminUserSeeder ausführen
+  ansible.builtin.command: php artisan db:seed --class=AdminUserSeeder --force
+  args:
+    chdir: /var/www/pterodactyl
+    creates: /var/www/pterodactyl/.admin_user_created
+  register: seeder_result
+  become: true
+
+- name: Markerdatei für Admin Seeder erstellen
+  ansible.builtin.file:
+    path: /var/www/pterodactyl/.admin_user_created
+    state: touch
+  when: seeder_result.changed
+  become: true

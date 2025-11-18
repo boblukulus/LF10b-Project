@@ -4,7 +4,7 @@
 4 Cores
 
 # Ubuntu Server Installation
-```JSON
+```json
 Setup Configuration {
     "Language": "English",
     "Update Installer": True,
@@ -23,32 +23,49 @@ Setup Configuration {
 }
 ```
 
-# Set static IPs
-
-```bash
-sudo nano /etc/netplan/50-cloud-init.yaml
-```
-
-```yaml
-network:
-  version: 2
-  ethernets:
-    ens160:
-      dhcp4: no
-      addresses:
-        - 192.168.65.161/24
-      nameservers:
-        addresses: [8.8.8.8, 8.8.4.4]
-    ens192:
-      dhcp4: true
-    ens224:
-      dhcp4: true
-```
-
-```bash
-sudo netplan apply
-```
-
 ## System Update
 nach reboot ausführen:
 `sudo apt update && sudo apt upgrade -y`
+
+# Backup Solution
+install borg backup
+`sudo apt install borgbackup -y`
+
+## Prepare user
+`sudo useradd -m backupuser`
+-m erstellt ein Home verzeichniss. Weil Linux das Warum auch immer standardmäßig keins erstellt
+`sudo passwd backupuser`
+Set new password (backupuser)
+
+## Prepare dir for backups
+```shell
+sudo mkdir /BACKUP
+sudo chown backupuser:backupuser /BACKUP #backupuser is the user that is the owner of the backup files
+```
+
+## Create Remote Repository
+! On the main server !
+
+```shell
+# Install Borg
+sudo apt install borgbackup -y
+
+# Init remote repo via ssh
+borg init backupuser@192.168.65.169:/BACKUP
+#Borgrepo PW = backupuser
+
+# export key
+borg key export backupuser@192.168.65.169:/BACKUP > /home/lf10b/backupkey.txt #Stored not on the backupserver
+
+# Create backup to remote repo
+sudo borg create -s --progress --verbose backupuser@192.168.65.169:/BACKUP::test001 /home /var/log /usr/share /etc /var/www /usr/local /var/lib
+```
+
+To list all backups:
+`borg list backupuser@192.168.65.169:/BACKUP`
+
+## Restore backup
+```bash
+cd /
+sudo borg extract --progress --verbose backupuser@192.168.65.169:/BACKUP::test001 /
+```

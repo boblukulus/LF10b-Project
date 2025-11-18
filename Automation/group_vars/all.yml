@@ -1,0 +1,33 @@
+pterodactyl_env:
+  app_url: "http://192.168.65.161/panel"
+  app_timezone: "UTC"
+  cache_driver: "redis"
+  session_driver: "redis"
+  queue_driver: "redis"
+  redis_host: "127.0.0.1"
+  redis_port: "6379"
+  enable_ui: "yes"
+  telemetry: "no"
+  db_host: "127.0.0.1"
+  db_port: "3306"
+  db_database: "panel"
+  db_username: "pterodactyl"
+  db_password: "123456"
+  mail_driver: "smtp"
+  mail_host: "smtp.example.com"
+  mail_port: "587"
+  mail_username: "boblukulus@outlook.com"
+  mail_password: "secret"
+  mail_encryption: "tls"
+
+pterodactyl:
+  db_name: "panel"
+  db_password: "{{ encrypted_db_password }}"
+  mariadb_root_password: "{{ encrypted_mariadb_root_password }}"
+
+pterodactyl_user:
+  admin_username: "admin"
+  admin_firstname: "Luis"
+  admin_lastname: "Rennert"
+  admin_email: "admin@minecraft.com"
+  admin_password: "superSicher123!"
