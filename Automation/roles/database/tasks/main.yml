@@ -96,12 +96,21 @@
     state: touch
   when: migrate_result is changed
 
-- name: Admin User erstellen
+- name: Admin Benutzer über Artisan anlegen (nur wenn nicht vorhanden)
   ansible.builtin.shell: >
     php artisan p:user:make
     --email="{{ pterodactyl_user.admin_email }}"
     --username="{{ pterodactyl_user.admin_username }}"
-    --name-first="{{ 
+    --name-first="{{ pterodactyl_user.admin_firstname }}"
+    --name-last="{{ pterodactyl_user.admin_lastname }}"
+    --password="{{ pterodactyl_user.admin_password }}"
+    --admin=1
+  args:
+    chdir: /var/www/pterodactyl
+  register: create_admin_user
+  when: admin_user_check.rc != 0
+  become: true
+
 
 - name: Cronjob einrichten
   ansible.builtin.cron:
