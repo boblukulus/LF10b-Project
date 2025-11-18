@@ -18,21 +18,21 @@
     login_user: root
     login_password: "{{ pterodactyl.mariadb_root_password }}"
 
-- name: Erstellen Pterodactyl Nutzer
+- name: Pterodactyl DB Benutzer für '%' anlegen
   community.mysql.mysql_user:
     name: "{{ pterodactyl_env.db_username }}"
     password: "{{ pterodactyl_env.db_password }}"
-    priv: '{{ pterodactyl.db_name }}.*:ALL'
+    priv: "{{ pterodactyl.db_name }}.*:ALL"
     host: "%"
     state: present
     login_user: root
     login_password: "{{ pterodactyl.mariadb_root_password }}"
 
-- name: Sicherstellen dass der Pterodactyl Nutzer sich mit dem localhost verbinden kann
+- name: Pterodactyl DB Benutzer für localhost anlegen
   community.mysql.mysql_user:
-    name: "{{ pterodactyl.db_name }}"
-    password: "{{ pterodactyl.db_password }}"
-    priv: '{{ pterodactyl.db_name }}.*:ALL'
+    name: "{{ pterodactyl_env.db_username }}"
+    password: "{{ pterodactyl_env.db_password }}"
+    priv: "{{ pterodactyl.db_name }}.*:ALL"
     host: "localhost"
     state: present
     login_user: root
