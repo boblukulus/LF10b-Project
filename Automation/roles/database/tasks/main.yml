@@ -96,7 +96,16 @@
     state: touch
   when: migrate_result is changed
 
-- name: Admin Benutzer über Artisan anlegen (nur wenn nicht vorhanden)
+- name: Prüfen ob Admin Benutzer existiert
+  ansible.builtin.shell: >
+    php artisan p:user:exists --email="{{ pterodactyl_user.admin_email }}"
+  args:
+    chdir: /var/www/pterodactyl
+  register: admin_user_check
+  ignore_errors: true
+  become: true
+
+- name: Admin Benutzer über Artisan anlegen
   ansible.builtin.shell: >
     php artisan p:user:make
     --email="{{ pterodactyl_user.admin_email }}"
@@ -107,9 +116,9 @@
     --admin=1
   args:
     chdir: /var/www/pterodactyl
-  register: create_admin_user
   when: admin_user_check.rc != 0
   become: true
+
 
 
 - name: Cronjob einrichten
