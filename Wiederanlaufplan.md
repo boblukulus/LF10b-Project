@@ -24,15 +24,16 @@ nach reboot ausführen:
 
 ## 2. Installations-Skript ausführen
 
-### Link zum [skript] ()
-### installiert SSH, ansible, BorkBackup
+Link zum [skript] ()
+installiert SSH, ansible, BorkBackup
 
 
 ## 3. Schritt Ansible-Skript für die Einrichtung
 
 ## 4. Schritt EInrichten / installieren von Monitoring
-### Es muss nun Graphana und Prometheus installiert werden
-### Link zum [Installationsguide](https://github.com/Lucsifer/LF10b-Project/blob/main/Server-config-guide.md#monitoring-23-sept-2025)
+Es muss nun Graphana und Prometheus installiert werden
+Link zum [Installationsguide](https://github.com/Lucsifer/LF10b-Project/blob/main/Server-config-guide.md#monitoring-23-sept-2025)
+
 ### Kurzbeschreibung: 
 Der Guide erklärt, wie Node Exporter, Minecraft Exporter, Prometheus und Grafana installiert und verbunden werden.
 
@@ -42,8 +43,8 @@ Der Guide erklärt, wie Node Exporter, Minecraft Exporter, Prometheus und Grafan
 - Fertiges Monitoring-Dashboard ist sofort nutzbar
 
 ## 5. Borkbackup installieren
-### Nun muss noch die Backupsoftware installiert werden
-### Link zum [Installationsguide](https://github.com/Lucsifer/LF10b-Project/blob/main/Backupserver-config-guide.md#create-remote-repository)
+Nun muss noch die Backupsoftware installiert werden
+Link zum [Installationsguide](https://github.com/Lucsifer/LF10b-Project/blob/main/Backupserver-config-guide.md#create-remote-repository)
 ### Kurzbeschreibung:  
 Der Guide zeigt, wie ein Remote-BorgBackup-Repository über SSH eingerichtet wird.  
 Dabei wird ein Backup-Benutzer genutzt, das Repository initialisiert und der Schlüssel exportiert, damit später automatisierte Backups möglich sind.
