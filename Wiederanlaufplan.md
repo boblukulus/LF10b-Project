@@ -1,4 +1,7 @@
 # Wiederanlaufplan Projekt-Pterodactyl
+<img width="1240" height="954" alt="image" src="https://github.com/user-attachments/assets/8e9cf52d-da08-4e63-8056-5cdddea55b00" />
+
+
 ## 1. Schritt Ubuntu Server Installation
 ```JSON
 Setup Configuration {
@@ -22,15 +25,19 @@ Setup Configuration {
 nach reboot ausführen:
 `sudo apt update && sudo apt upgrade -y`
 
-## 2. Installations-Skript ausführen
+### Installiere relevanter Dienste
+- BorgBackup ``` sudo apt install borgbackup ```
+- Ansible ``` sudo apt install ansible ```
 
-Link zum [skript] ()
-installiert SSH, ansible, BorkBackup
 
+## 2. Schritt Ansible-Skript für die Einrichtung
 
-## 3. Schritt Ansible-Skript für die Einrichtung
+- Ansible-Skript aus github ziehen
+- IP adressen anpassen in `inventory`, `ansible.cfg`, `group_vars/all.yml`
+- Playbook ausführen: `ansible-playbook main.yml --ask-become-pass --ask-vault-pass`
+- Letzte Installationsschritte ausführen -> [Pterodactyl Doku](https://pterodactyl.io/wings/1.0/installing.html#configure) (Kann leider aus technischen Gründen nicht automatisiert werden.)
 
-## 4. Schritt EInrichten / installieren von Monitoring
+## 3. Schritt EInrichten / installieren von Monitoring
 Es muss nun Graphana und Prometheus installiert werden
 Link zum [Installationsguide](https://github.com/Lucsifer/LF10b-Project/blob/main/Server-config-guide.md#monitoring-23-sept-2025)
 
@@ -42,19 +49,8 @@ Der Guide erklärt, wie Node Exporter, Minecraft Exporter, Prometheus und Grafan
 - Prometheus läuft auf **9090**, Grafana auf **3000**  
 - Fertiges Monitoring-Dashboard ist sofort nutzbar
 
-## 5. Borkbackup installieren
-Nun muss noch die Backupsoftware installiert werden
-Link zum [Installationsguide](https://github.com/Lucsifer/LF10b-Project/blob/main/Backupserver-config-guide.md#create-remote-repository)
-### Kurzbeschreibung:  
-Der Guide zeigt, wie ein Remote-BorgBackup-Repository über SSH eingerichtet wird.  
-Dabei wird ein Backup-Benutzer genutzt, das Repository initialisiert und der Schlüssel exportiert, damit später automatisierte Backups möglich sind.
 
-### Ergebnis:  
-- Remote Borg-Repository ist eingerichtet  
-- Schlüssel ist außerhalb des Backupservers gesichert  
-- System ist bereit für automatisierte Backups
-
-## 6. Backup wieder einspielen
+## 5. Backup wieder einspielen
 ### Backups auflisten
 ```bash
 borg list backupuser@192.168.65.169:/BACKUP
