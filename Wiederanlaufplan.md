@@ -1,5 +1,5 @@
 # Wiederanlaufplan Projekt-Pterodactyl
-<img width="1240" height="954" alt="image" src="https://github.com/user-attachments/assets/8e9cf52d-da08-4e63-8056-5cdddea55b00" />
+<img alt="image" src="https://github.com/user-attachments/assets/8e9cf52d-da08-4e63-8056-5cdddea55b00" />
 
 
 ## 1. Schritt Ubuntu Server Installation
