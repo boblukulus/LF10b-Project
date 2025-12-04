@@ -45,4 +45,4 @@
   ansible.builtin.shell: curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
 
 - name: Installieren von mysqlclient
-  ansible.builtin.shell: pip3 install mysqlclient --break-system-packages
+  ansible.builtin.shell: pip3 install mysqlclient --break-system-packages 
