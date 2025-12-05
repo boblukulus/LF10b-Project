@@ -1,4 +1,4 @@
-# Pterodactyl - Minecraft Server
+# Schutzbedarfsfeststellung - Pterodactyl - Minecraft Server
 
 ## Inhaltsverzeichnis
 
@@ -46,5 +46,17 @@ Im ersten Schritt haben wir Luis zum Informationssicherheitsbeauftragten ernannt
 ##### Anmerkung
 Da kein Unternehmen, sondern nur eine kleine Projektgruppe hinter dem Lernprojekt steht müssen keine Geschäftsprozesse, Räumlichkeiten, Abteilungen, etc. beschrieben und untersucht werden.
 
+---
+## 3. Ist-Stand 
 
+### 3.1. Netzplan
 
+![Netzplan](3-2Netzplan.jpg)
+
+### 3.2. IT-Systeme
+
+In den Tabellen sind die IT-Systeme jeweils durchnummeriert.
+Der Vorangestellte Buchstabe kennzeichnet jeweils ihren Typ (L = Laptop, S = Server (als VM), H = Hypervisor)
+
+|Nr|Beschreibung|Plattform|Standort|
+|---|---|---|---|
