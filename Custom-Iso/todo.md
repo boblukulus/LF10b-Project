@@ -1,0 +1,4 @@
+- Ansible installation
+- Git installation
+- Borg installation
+- ssh key creation
