@@ -8,16 +8,19 @@
           <mxGeometry x="389" y="50" width="50" height="50" as="geometry" />
         </mxCell>
         <mxCell id="tp_N-CATEl2_JmioCMO2-2" value="Macbook Pro mit VMware Fusion Hypervisor" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="80" y="190" width="200" height="260" as="geometry" />
+          <mxGeometry x="80" y="190" width="200" height="360" as="geometry" />
         </mxCell>
         <mxCell id="tp_N-CATEl2_JmioCMO2-3" value="Pterodactyl&#xa;Server&#xa;(Produktiv)" style="fillColorStyles=neutralFill;neutralFill=#9DA6A8;shape=mxgraph.networks2.icon;aspect=fixed;fillColor=#EDEDED;strokeColor=#000000;gradientColor=#5B6163;network2IconShadow=1;network2bgFillColor=none;labelPosition=center;verticalLabelPosition=bottom;align=center;verticalAlign=top;network2Icon=mxgraph.networks2.mainframe;network2IconW=0.4721;network2IconH=1;" parent="tp_N-CATEl2_JmioCMO2-2" vertex="1">
-          <mxGeometry x="40" y="50" width="23.605" height="50" as="geometry" />
+          <mxGeometry x="38.2" y="130" width="23.605" height="50" as="geometry" />
         </mxCell>
         <mxCell id="tp_N-CATEl2_JmioCMO2-5" value="Backup&#xa;Server" style="fillColorStyles=neutralFill;neutralFill=#9DA6A8;shape=mxgraph.networks2.icon;aspect=fixed;fillColor=#EDEDED;strokeColor=#000000;gradientColor=#5B6163;network2IconShadow=1;network2bgFillColor=none;labelPosition=center;verticalLabelPosition=bottom;align=center;verticalAlign=top;network2Icon=mxgraph.networks2.mainframe;network2IconW=0.4721;network2IconH=1;" parent="tp_N-CATEl2_JmioCMO2-2" vertex="1">
-          <mxGeometry x="140" y="50" width="23.605" height="50" as="geometry" />
+          <mxGeometry x="138.2" y="130" width="23.605" height="50" as="geometry" />
         </mxCell>
         <mxCell id="tp_N-CATEl2_JmioCMO2-6" value="Ansible&#xa;Controlhost" style="fillColorStyles=neutralFill;neutralFill=#9DA6A8;shape=mxgraph.networks2.icon;aspect=fixed;fillColor=#EDEDED;strokeColor=#000000;gradientColor=#5B6163;network2IconShadow=1;network2bgFillColor=none;labelPosition=center;verticalLabelPosition=bottom;align=center;verticalAlign=top;network2Icon=mxgraph.networks2.mainframe;network2IconW=0.4721;network2IconH=1;" parent="tp_N-CATEl2_JmioCMO2-2" vertex="1">
-          <mxGeometry x="40" y="160" width="23.605" height="50" as="geometry" />
+          <mxGeometry x="38.2" y="240" width="23.605" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="Q_rdHkiSxwsgMxSIiTP6-1" value="" style="shape=mxgraph.networks2.icon;aspect=fixed;fillColor=#EDEDED;strokeColor=#000000;gradientColor=#5B6163;network2IconShadow=1;network2bgFillColor=none;labelPosition=center;verticalLabelPosition=bottom;align=center;verticalAlign=top;network2Icon=mxgraph.networks2.firewall;network2IconXOffset=0.0001;network2IconYOffset=0.0001;network2IconW=1;network2IconH=0.608;" vertex="1" parent="tp_N-CATEl2_JmioCMO2-2">
+          <mxGeometry x="25" y="60" width="50" height="30.4" as="geometry" />
         </mxCell>
         <mxCell id="tp_N-CATEl2_JmioCMO2-4" value="" style="html=1;outlineConnect=0;fillColor=#CCCCCC;strokeColor=#6881B3;gradientColor=none;gradientDirection=north;strokeWidth=2;shape=mxgraph.networks.comm_link_edge;html=1;rounded=0;entryX=0;entryY=0.66;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" parent="1" source="tp_N-CATEl2_JmioCMO2-2" target="tp_N-CATEl2_JmioCMO2-1" edge="1">
           <mxGeometry width="100" height="100" relative="1" as="geometry">

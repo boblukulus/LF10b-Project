@@ -46,7 +46,7 @@ Im ersten Schritt haben wir Luis zum Informationssicherheitsbeauftragten ernannt
 ##### Anmerkung
 Da kein Unternehmen, sondern nur eine kleine Projektgruppe hinter dem Lernprojekt steht müssen keine Geschäftsprozesse, Räumlichkeiten, Abteilungen, etc. beschrieben und untersucht werden.
 
----
+
 ## 3. Ist-Stand 
 
 ### 3.1. Netzplan
@@ -58,5 +58,14 @@ Da kein Unternehmen, sondern nur eine kleine Projektgruppe hinter dem Lernprojek
 In den Tabellen sind die IT-Systeme jeweils durchnummeriert.
 Der Vorangestellte Buchstabe kennzeichnet jeweils ihren Typ (L = Laptop, S = Server (als VM), H = Hypervisor)
 
-|Nr|Beschreibung|Plattform|Standort|
-|---|---|---|---|
+|Nr|Beschreibung|Plattform|Standort|Anzahl|
+|---|---|---|---|---|
+|L01|Macbook Pro (Produktivsystem bereitstellung)|MacOS 26.1 Tahoe|Physisch|1|
+|L02|Macbook Air (Automation Testsystem)|MacOS 26.1 Tahoe|Physisch|1|
+|H01|VMware Fusion Hypervisor|VMware Fusion Professional 13.6.4|L01 & L02|2|
+|S01|Pterodactyl Server (Produktivsystem)|Ubuntu Server 24.04.3 LTS aarch64|L01|1|
+|S02|Borg Backup Server (Produktivsystem)|Ubuntu Server 24.04.3 LTS aarch64|L01|1|
+|S03|Ansible Control Host (Produktivsystem)|Ubuntu Server 24.04.3 LTS aarch64|L01|1|
+|S04|Pterodactyl Server (Testsystem)|Ubuntu Server 24.04.3 LTS aarch64|L02|1|
+|S05|Borg Backup Server (Testsystem)|Ubuntu Server 24.04.3 LTS aarch64|L02|1|
+|S06|Ansible Control Host (Testsystem)|Ubuntu Server 24.04.3 LTS aarch64|L02|1|
