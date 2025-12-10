@@ -184,7 +184,8 @@ In unserem Projekt gibt es keinen sehr hohen Schutzbedarf im realen Sinne, da ke
 Ich habe gelernt, wie man eine Schutzbedarfsanalyse nicht nur auf einzelne Szenarien wie bisher anwendet, sondern auch auf ein Projekt oder Unternehmen. Zum Ausarbeiten dieser SOL habe ich dieses Quelle vom BSI genutzt: https://www.bsi.bund.de/SharedDocs/Downloads/DE/BSI/Grundschutz/Hilfsmittel/Recplast/Beschreibung_Recplast.pdf?__blob=publicationFile&v=1 und die Sätze an geeigneten Stellen in der Schutzbedarfsanalyse mittels ChatGPT 5.0 "geglättet" nachdem ich die Originaltexte erarbeitet hatte. Weiterhin war es lehrreich das Projekt so weit auseinanderzunehmen, um wichtige Sicherheitsaspekte beschreiben zu können. Weiterhin konnte ich für mich mitnehmen wie man die Schutzbedarfskategorien anpasst auf sein Projekt und sinnvoll beschreibt.
 -Luis
 
-// Roberts Text
+Ich finde es wichtig zu wissen wie man ein IT-System korrekt absichert, um die Daten jedes Nutzenden zu schützen. Das Thema IT-Sec wird leider viel zu oft vernachlässigt, weswegen ich möglichst viel über IT-Sicherheit lernen möchte, um in Zukunft den Aspekt der Sicherheit bei meinen Arbeitgebenden Firmen oder im Privaten/Freundesumfeld umsetzen zu können.
+Ich habe gelernt, dass es nicht gerade einfach ist ein solches System abzusichern und wie die Praktiken des BSI-Grundschutzes angewand werden sowie wie man den Schutzbedarf, das Risiko und die möglichen Bedrohungen feststellt.
 -Robert
 
 // Lucas Text
