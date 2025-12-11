@@ -188,7 +188,7 @@ Ich finde es wichtig zu wissen wie man ein IT-System korrekt absichert, um die D
 Ich habe gelernt, dass es nicht gerade einfach ist ein solches System abzusichern und wie die Praktiken des BSI-Grundschutzes angewand werden sowie wie man den Schutzbedarf, das Risiko und die möglichen Bedrohungen feststellt.
 -Robert
 
-// Lucas Text
+Mein wichtigstes Learning aus der Arbeit an der Schutzbedarfsanalyse war, dass ein IT-System nur sehr schwer annähernd sicherer gemacht werden kann. Dafür muss man auch  zuerst versteht, wie unterschiedlich die Risiken und potenziellen Probleme tatsächlich sind. Die Analyse hat mir gezeigt, dass nicht jede Information und nicht jeder Prozess gleich kritisch ist und dass genau diese Unterschiede entscheidend dafür sind, wo Schutzmaßnahmen am wirkungsvollsten angesetzt werden können. 
 -Lucas
 
 ### 5.2 Wie kommt man zu dem Ergebnis
