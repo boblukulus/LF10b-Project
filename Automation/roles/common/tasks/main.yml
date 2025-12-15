@@ -11,6 +11,7 @@
     path: /etc/apt/keyrings/redis_key.gpg
     state: absent
   become: true
+  no_log: true
 
 - name: Check status of GPG Key
   ansible.builtin.stat:
@@ -28,12 +29,14 @@
   ansible.builtin.command:
     cmd: gpg --dearmor -o /usr/share/keyrings/redis-archive-keyrings.gpg /etc/apt/keyrings/redis_key.gpg
   when: not redis_key_status.stat.exists
+  no_log: true
 
 - name: Cleanup temporary key file
   ansible.builtin.file:
     path: /etc/apt/keyrings/redis_key.gpg
     state: absent
   become: true
+  no_log: true
 
 - name: Update
   ansible.builtin.command: apt update
