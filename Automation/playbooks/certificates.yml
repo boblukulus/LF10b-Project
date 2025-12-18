@@ -1,0 +1,8 @@
+---
+
+- name: Test Playbook für die Rolle certificates
+  hosts: all
+  become: true
+
+  roles:
+    - role: ca

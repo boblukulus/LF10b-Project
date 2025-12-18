@@ -1,0 +1,8 @@
+---
+
+- name: Test Playbook für die Rolle wings
+  hosts: all
+  become: true
+
+  roles:
+    - role: wings

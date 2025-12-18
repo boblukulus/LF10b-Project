@@ -83,11 +83,11 @@
 
 - name: String auf den Backup Server verschieben
   ansible.builtin.lineinfile:
-    path: /home/luis/backup/key.txt     # Hier den korrekten Speicherort einfügen wo die Datei auf dem Backup Server gespeichert werden soll
+    path: /home/luis/backup/key.txt             # Hier den korrekten Speicherort einfügen wo die Datei auf dem Backup Server gespeichert werden soll
     line: "{{ app_key_output.stdout }}"
     state: present
     create: true
-  delegate_to: 192.168.0.43             # IP des Backup Server angeben
+  delegate_to: "{{ playbook.backup_server_ip }}"  # IP des Backup Server angeben
   run_once: true                                # Stellt sicher dass die task nur einmal durchläuft
   no_log: true
 

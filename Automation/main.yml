@@ -13,3 +13,4 @@
     - role: database
     - role: webserver
     - role: wings
+    - role: ca

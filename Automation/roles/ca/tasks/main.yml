@@ -1,0 +1,89 @@
+---
+
+- name: Sicherstellen das der CA Ordner existiert
+  file:
+    path: /etc/ssl/myca
+    state: directory
+    mode: '0700'
+
+- name: Erstellen des Root CA Schlüssels
+  openssl_privatekey:
+    path: /etc/ssl/myca/rootCA.key
+    size: 4096
+    type: RSA
+
+- name: Erstellen des Root Zertifikat
+  openssl_certificate:
+    path: /etc/ssl/myca/rootCA.key
+    privatekey_path: /etc/ssl/myca/rootCA.key
+    provider: selfsigned
+    subject:
+      common_name: "Pterodactyl Root CA"
+    valid_days: 3650
+  register: root_ca
+
+- name: Sicherstellen das Zertifikat Verzeichnis existiert
+  file:
+    path: "/etc/ssl/{{ inventory_hostname }}"
+    state: directory
+    mode: '0755'
+
+- name: Generieren des privaten Schlüssel für den Server
+  openssl_privatekey:
+    path: "/etc/ssl/{{ inventory_hostname }}/server.key"
+    size: 2048
+
+- name: Erstellen einer Certificate Signing Request (CSR)
+  openssl_csr:
+    path: "/etc/ssl/{{ inventory_hostname }}/server.csr"
+    privatekey_path: "/etc/ssl/{{ inventory_hostname }}/server.key"
+    subject:
+      common_name: "{{ cert_cn }}"
+    san:
+      - "DNS:{{ cert_cn }}"
+      - "IP:{{ ansible_host }}"
+
+- name: Zertifikat signen mittels CA
+  openssl_certificate:
+    path: "/etc/ssl/{{ inventory_hostname }}/server.crt"
+    csr_path: "/etc/ssl/{{ inventory_hostname }}/server.csr"
+    provider: ownca
+    ownca_path: /etc/ssl/myca/rootCA.key
+    valid_days: 825
+
+- name: Zertifikat bereitstellen
+  copy:
+    src: "/etc/ssl/{{ inventory_hostname }}/server.crt"
+    dest: "/etc/ssl/{{ inventory_hostname }}/server.key"
+    mode: '0644'
+
+- name: Privaten Key bereitstellen
+  copy:
+    src: "/etc/ssl/{{ inventory_hostname }}/server.key"
+    dest: "/etc/ssl/pterodactyl/server.key"
+    mode: '0600'
+
+- name: Installieren des Root CA auf dem Zielserver
+  copy:
+    src: /etc/ssl/myca/rootCA.crt
+    dest: /usr/local/share/ca-certificates/rootCA.crt
+
+- name: Aktualisierung von bekannten Zertifikaten
+  command: update-ca-certificates
+
+- name: Aktivieren des Apache SSL Modul
+  ansible.builtin.command: a2enmod ssl
+
+- name: SSL auf dem Pterodactyl Server bereitstellen
+  template:
+    src: panel-ssl.conf.j2
+    dest: /etc/apache2/sites-available/panel-ssl.conf
+
+- name: Aktivieren von SSL auf Pterodactyl Server
+  ansible.builtin.command: a2ensite panel-ssl.conf
+
+- name: Neustart Apache
+  service:
+    name: apache2
+    status: restarted
+
