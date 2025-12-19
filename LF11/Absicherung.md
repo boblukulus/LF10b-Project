@@ -30,193 +30,67 @@ Generated PW is `x2c1isaH`
 
 Für eine FQDN kann im Dashboard -> Settings -> Local DNS Records ein entsprechender Eintrag angelegt werden.
 
-FQDN = `lab.xxxmc_69xxx.local`
+FQDN = `pt-panel.lab`
 
-## Lokale CA
-Auf dem Pterodactyl server
+Die Systeme müssen noch konfiguriert werden, sodass sie den DNSserver benutzen
 
-```bash
-sudo mkdir ~/ca
-cd ~/ca
-```
+## Zertifikat
 
-CA key & Zertifikat erstellen
-```bash
-openssl genrsa -out ca.key 4096
+Für das Zertifikat wird OpenSSL genutzt. Mehr informationen hier --> ([OpenSSL - Ubuntu Server Documentation](https://documentation.ubuntu.com/server/explanation/crypto/openssl/))
 
-openssl req -x509 -new -nodes -key ca.key \
-  -sha256 -days 3650 \
-  -out ca.crt
-
-# Country NAme: DE
-# State: Saxony
-# Locality Name: Local Area
-# Organization: Aperture LAboratories
-# Organizational Unit Name: Test Facility
-# Common Name: lab.xxxmc_69xxx.local
-# Email: 
-```
-
-## Panel Zertifikat (Signiert von lokaler CA)
+Für SSL wird ein extra ordner benötigt. 
 
 ```bash
-mkdir panel
-cd panel
-
-# panel key
-openssl genrsa -out panel.lan.key 4096
-openssl req -new -key panel.lan.key -out panel.lan.csr
-# Country NAme: DE
-# State: Saxony
-# Locality Name: Local Area
-# Organization: Aperture LAboratories
-# Organizational Unit Name: Test Facility
-# Common Name: panel.xxxmc_69xxx.local
-# Email: 
-# Challenge password: pterodactyl-key
+sudo mkdir -p /etc/ssl/pterodactyl
+cd /etc/ssl/pterodactyl
 ```
 
-## SAN config (moderne Browser)
-```bash
-nano panel.ext
-```
-
-Folgendes einfügen
-```ini
-authorityKeyIdentifier=keyid,issuer
-basicConstraints=CA:FALSE
-keyUsage = digitalSignature, keyEncipherment
-extendedKeyUsage = serverAuth
-subjectAltName = @alt_names
-
-[alt_names]
-DNS.1 = panel.xxxmc_69xxx.local
-IP.1  = 192.168.65.161
-```
-
-## Zertifikat Signieren
+Anschließend wird ein Zertifikat und ein key generiert.
 
 ```bash
-openssl x509 -req -in pterodactyl-panel.csr \
-  -CA ../ca.crt -CAkey ../ca.key -CAcreateserial \
-  -out pterodactyl-panel.crt \
-  -days 3560 -sha256 \
-  -extfile panel.ext
+sudo openssl req -x509 -nodes -days 3650 \
+  -newkey rsa:4096 \
+  -keyout pterodactyl.key \
+  -out pterodactyl.crt
 ```
 
-## Zertifikat für Nginx installieren
+Als Common Name muss die FQDN gesetzt werden!
 
-```bash
-sudo mkdir -p /etc/nginx/ssl
-sudo cp pterodactyl-server.crt pterodactyl-server.key /etc/nginx/ssl
-sudo chmod 600 /etc/nginx/ssl/panel.lan.key
-```
-
-## Nginx HTTPS Config (Pterodactyl)
+### Nginx Config
 
 ```bash
 sudo nano /etc/nginx/sites-available/pterodactyl.conf
 ```
 
 ```nginx
+# HTTP redirect to HTTPS
 server {
-    # Replace the example <domain> with your domain name or IP address
-    listen 443;
-    server_name lab.xxxmc_69xxx.local;
-
-    root /var/www/pterodactyl/public;
-    index index.html index.htm index.php;
-    charset utf-8;
-
-    ssl_certificate     /etc/nginx/ssl/pterodactyl-server.crt
-    ssl_certificate_key /etc/nginx/ssl/pterodactyl-server.key
-
-    ssl_protocols TLSv1.2 TLSv1.3
-
-    location / {
-        try_files $uri $uri/ /index.php?$query_string;
-    }
-
-    location = /favicon.ico { access_log off; log_not_found off; }
-    location = /robots.txt  { access_log off; log_not_found off; }
-
-    access_log off;
-    error_log  /var/log/nginx/pterodactyl.app-error.log error;
-
-    # allow larger file uploads and longer script runtimes
-    client_max_body_size 100m;
-    client_body_timeout 120s;
-
-    sendfile off;
-
-    location ~ \.php$ {
-        fastcgi_split_path_info ^(.+\.php)(/.+)$;
-        fastcgi_pass unix:/run/php/php8.3-fpm.sock;
-        fastcgi_index index.php;
-        include fastcgi_params;
-        fastcgi_param PHP_VALUE "upload_max_filesize = 100M \n post_max_size=100M";
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-        fastcgi_param HTTP_PROXY "";
-        fastcgi_intercept_errors off;
-        fastcgi_buffer_size 16k;
-        fastcgi_buffers 4 16k;
-        fastcgi_connect_timeout 300;
-        fastcgi_send_timeout 300;
-        fastcgi_read_timeout 300;
-    }
-
-    location ~ /\.ht {
-        deny all;
-    }
+    listen 80;
+    server_name pt-label.lab;
+    return 301 https://$host$request_uri;
 }
-```
-
-Nginx neu laden
-```bash
 server {
-    # Replace the example <domain> with your domain name or IP address
-    listen 443;
-    server_name lab.xxxmc_69xxx.local;
+    listen 443 ssl http2;
+    server_name pt-label.lab;
 
     root /var/www/pterodactyl/public;
-    index index.html index.htm index.php;
-    charset utf-8;
+    index index.php;
 
-    ssl_certificate     /etc/nginx/ssl/pterodactyl-panel.crt;
-    ssl_certificate_key /etc/nginx/ssl/pterodactyl-panel.key;
+    ssl_certificate     /etc/ssl/pterodactyl/pterodactyl.crt;
+    ssl_certificate_key /etc/ssl/pterodactyl/pterodactyl.key;
 
     ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+
+    client_max_body_size 100m;
 
     location / {
         try_files $uri $uri/ /index.php?$query_string;
     }
 
-    location = /favicon.ico { access_log off; log_not_found off; }
-    location = /robots.txt  { access_log off; log_not_found off; }
-
-    access_log off;
-    error_log  /var/log/nginx/pterodactyl.app-error.log error;
-
-    # allow larger file uploads and longer script runtimes
-    client_max_body_size 100m;
-    client_body_timeout 120s;
-
-    sendfile off;
-
     location ~ \.php$ {
-        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        include snippets/fastcgi-php.conf;
         fastcgi_pass unix:/run/php/php8.3-fpm.sock;
-        fastcgi_index index.php;
-        include fastcgi_params;
-        fastcgi_param PHP_VALUE "upload_max_filesize = 100M \n post_max_size=100M";
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-        fastcgi_param HTTP_PROXY "";
-        fastcgi_intercept_errors off;
-        fastcgi_buffer_size 16k;
-        fastcgi_buffers 4 16k;
-        fastcgi_connect_timeout 300;
-        fastcgi_send_timeout 300;
-        fastcgi_read_timeout 300;
     }
 
     location ~ /\.ht {
@@ -224,6 +98,45 @@ server {
     }
 }
 ```
+
+Anschließend nginx neustarten
+
+```bash
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+### Pterodactyl config
+
+in der Evironment datei anpassen.
+```bash
+cd /var/www/pterodactyl
+sudo nano .env
+```
+
+Folgende Variablen einbauen
+```env
+APP_URL=https://pt-panel.lab
+SESSION_SECURE_COOKIE=true
+```
+
+Anschließend Speichern
+
+#### Cache Leeren & Services neustarten
+
+```bash
+# Clear Cache
+php artisan optimize:clear
+php artisan config:clear
+php artisan view:clear
+
+# Restart services
+sudo systemctl restart php8.3-fpm
+sudo systemctl restart nginx
+```
+
+Nun sollte das Panel mit https erreichbar sein. Das Zertifikat sieht wie folgt aus:
+![Screenshot von einem Zertifikat](Absicherung-Zertifikat.png)
 
 # Firewall Setup
 
