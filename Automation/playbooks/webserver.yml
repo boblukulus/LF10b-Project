@@ -1,0 +1,9 @@
+
+---
+
+- name: Test Playbook für die Rolle webserver
+  hosts: all
+  become: true
+
+  roles:
+    - role: webserver

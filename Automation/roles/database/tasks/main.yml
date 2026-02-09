@@ -17,6 +17,7 @@
     state: present
     login_user: root
     login_password: "{{ pterodactyl.mariadb_root_password }}"
+  no_log: true
 
 - name: Pterodactyl DB Benutzer für '%' anlegen
   community.mysql.mysql_user:
@@ -27,6 +28,7 @@
     state: present
     login_user: root
     login_password: "{{ pterodactyl.mariadb_root_password }}"
+  no_log: true
 
 - name: Pterodactyl DB Benutzer für localhost anlegen
   community.mysql.mysql_user:
@@ -37,6 +39,7 @@
     state: present
     login_user: root
     login_password: "{{ pterodactyl.mariadb_root_password }}"
+  no_log: true
 
 - name: Korrekte Rechte einrichten für den Webserver
   ansible.builtin.file:
@@ -46,6 +49,7 @@
     state: directory
     recurse: yes
   become: true
+  no_log: true
 
 - name: Installieren von Kern Abhängigkeiten
   ansible.builtin.shell:
@@ -63,25 +67,29 @@
     cmd: "grep -q '^APP_KEY=' /var/ww/pterodactyl/.env"
   register: app_key_check
   ignore_errors: true
+  no_log: true
 
 - name: Generieren eines neuen App Key
   ansible.builtin.shell:
     cmd: php artisan key:generate --force
     chdir: /var/www/pterodactyl
   when: app_key_check.rc != 0
+  no_log: true
 
 - name: Einlesen des App Key aus der .env file
   ansible.builtin.shell: "grep -oP '(?<=^APP_KEY=).*' /var/www/pterodactyl/.env"
   register: app_key_output
+  no_log: true
 
 - name: String auf den Backup Server verschieben
   ansible.builtin.lineinfile:
-    path: /home/luis/backup/key.txt     # Hier den korrekten Speicherort einfügen wo die Datei auf dem Backup Server gespeichert werden soll
+    path: /home/luis/backup/key.txt             # Hier den korrekten Speicherort einfügen wo die Datei auf dem Backup Server gespeichert werden soll
     line: "{{ app_key_output.stdout }}"
     state: present
     create: true
-  delegate_to: 192.168.0.43             # IP des Backup Server angeben
+  delegate_to: "{{ playbook.backup_server_ip }}"  # IP des Backup Server angeben
   run_once: true                                # Stellt sicher dass die task nur einmal durchläuft
+  no_log: true
 
 - name: Datenbank Migration und Seed
   ansible.builtin.command: php artisan migrate --seed --force
@@ -89,6 +97,7 @@
     chdir: /var/www/pterodactyl
   register: migrate_result
   changed_when: "'Nothing to migrate' not in migrate_result.stdout"
+  no_log: true
 
 - name: Erstellt Markerdatei
   ansible.builtin.file:
@@ -103,6 +112,7 @@
     query: "DELETE FROM users WHERE username = '{{ pterodactyl_user.admin_username }}';"
     login_db: "{{ pterodactyl.db_name }}"
   ignore_errors: true
+  no_log: true
 
 - name: Admin Benutzer über Artisan anlegen
   ansible.builtin.shell: >
@@ -116,6 +126,7 @@
   args:
     chdir: /var/www/pterodactyl
   become: true
+  no_log: true
 
 - name: Cronjob einrichten
   ansible.builtin.cron:

@@ -21,3 +21,4 @@
   loop:
     - /var/www/pterodactyl/storage/*
     - /var/www/pterodactyl/bootstrap/cache 
+  no_log: true

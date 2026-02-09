@@ -1,23 +1,24 @@
 ---
 
-- name: Add add-apt-repository command
+- name: Hinzufügen des add-apt-repository command
   ansible.builtin.command: apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
 
-- name: Add additional repositories for PHP (Ubuntu 22.04)
+- name: Hinzufügen der benötigten Repositorys für PHP (Ubuntu 22.04)
   ansible.builtin.shell: LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
 
-- name: Cleanup temporary key file
+- name: Temporäre Schlüsseldatei löschen
   ansible.builtin.file:
     path: /etc/apt/keyrings/redis_key.gpg
     state: absent
   become: true
+  no_log: true
 
-- name: Check status of GPG Key
+- name: Status des GPG Key checken
   ansible.builtin.stat:
     path: /usr/share/keyrings/redis-archive-keyrings.gpg
   register: redis_key_status
 
-- name: Add redis official APT Repository GPG key
+- name: Hinzufügen des offiziellen Redis APT Repository GPG Key
   ansible.builtin.get_url:
     url: https://packages.redis.io/gpg
     dest: /etc/apt/keyrings/redis_key.gpg
@@ -28,21 +29,28 @@
   ansible.builtin.command:
     cmd: gpg --dearmor -o /usr/share/keyrings/redis-archive-keyrings.gpg /etc/apt/keyrings/redis_key.gpg
   when: not redis_key_status.stat.exists
+  no_log: true
 
-- name: Cleanup temporary key file
+- name: Temporäre Schlüsseldatei löschen
   ansible.builtin.file:
     path: /etc/apt/keyrings/redis_key.gpg
     state: absent
   become: true
+  no_log: true
 
-- name: Update
+- name: Update des Systems
   ansible.builtin.command: apt update
 
-- name: Install dependencies
+- name: Installieren von Abhängigkeiten
   ansible.builtin.shell: apt -y install php8.3 php8.3-common php8.3-cli php8.3-gd php8.3-mysql php8.3-mbstring php8.3-bcmath php8.3-xml php8.3-fpm php8.3-curl php8.3-zip mariadb-server nginx tar unzip git redis-server libapache2-mod-php8.3 curl python3-pip python3-dev default-libmysqlclient-dev build-essential pkg-config
 
-- name: Installing Composer
+- name: Installation Composer für PHP
   ansible.builtin.shell: curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
 
 - name: Installieren von mysqlclient
   ansible.builtin.shell: pip3 install mysqlclient --break-system-packages 
+
+- name: Installieren von openssl
+  ansible.builtin.apt:
+    name: openssl
+    state: latest

@@ -1,0 +1,135 @@
+---
+- hosts: all
+  become: true
+  vars:
+    local_ca_dir: "./myca"
+    remote_ssl_dir: "/etc/ssl/{{ inventory_hostname }}"
+    cert_common_name: "{{ cert_cn | default(inventory_hostname) }}"
+
+  handlers:
+    - name: Restart Apache
+      service:
+        name: apache2
+        state: restarted
+
+    - name: Update CA Store
+      command: update-ca-certificates
+      listen: Update CA Store
+
+  tasks:
+    - name: Lokales CA-Verzeichnis erstellen
+      delegate_to: localhost
+      run_once: true
+      file:
+        path: "{{ local_ca_dir }}"
+        state: directory
+        mode: '0700'
+
+    - name: CA Private Key erstellen
+      delegate_to: localhost
+      run_once: true
+      community.crypto.openssl_privatekey:
+        path: "{{ local_ca_dir }}/rootCA.key"
+        size: 4096
+
+    - name: CA CSR erstellen
+      delegate_to: localhost
+      run_once: true
+      community.crypto.openssl_csr:
+        path: "{{ local_ca_dir }}/rootCA.csr"
+        privatekey_path: "{{ local_ca_dir }}/rootCA.key"
+        common_name: "Pterodactyl Root CA"
+        basic_constraints: "CA:TRUE"
+
+    - name: CA Zertifikat erstellen
+      delegate_to: localhost
+      run_once: true
+      community.crypto.x509_certificate:
+        path: "{{ local_ca_dir }}/rootCA.crt"
+        csr_path: "{{ local_ca_dir }}/rootCA.csr"
+        privatekey_path: "{{ local_ca_dir }}/rootCA.key"
+        provider: selfsigned
+        selfsigned_not_after: "+3650d"
+
+    - name: Server SSL Verzeichnis erstellen
+      file:
+        path: "{{ remote_ssl_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Pterodactyl SSL Verzeichnis erstellen
+      file:
+        path: /etc/ssl/pterodactyl
+        state: directory
+        mode: '0755'
+
+    - name: Server Private Key erstellen
+      community.crypto.openssl_privatekey:
+        path: "{{ remote_ssl_dir }}/server.key"
+        size: 2048
+        mode: '0600'
+
+    - name: Server CSR erstellen
+      community.crypto.openssl_csr:
+        path: "{{ remote_ssl_dir }}/server.csr"
+        privatekey_path: "{{ remote_ssl_dir }}/server.key"
+        common_name: "{{ cert_common_name }}"
+        subject_alt_name:
+          - "DNS:{{ cert_common_name }}"
+          - "IP:{{ ansible_host }}"
+
+    - name: CSR abrufen
+      fetch:
+        src: "{{ remote_ssl_dir }}/server.csr"
+        dest: "{{ local_ca_dir }}/requests/{{ inventory_hostname }}.csr"
+        flat: yes
+
+    - name: Zertifikat signieren
+      delegate_to: localhost
+      community.crypto.x509_certificate:
+        path: "{{ local_ca_dir }}/issued/{{ inventory_hostname }}.crt"
+        csr_path: "{{ local_ca_dir }}/requests/{{ inventory_hostname }}.csr"
+        provider: ownca
+        ownca_path: "{{ local_ca_dir }}/rootCA.crt"
+        ownca_privatekey_path: "{{ local_ca_dir }}/rootCA.key"
+        ownca_not_after: "+825d"
+
+    - name: Signiertes Zertifikat verteilen
+      copy:
+        src: "{{ local_ca_dir }}/issued/{{ inventory_hostname }}.crt"
+        dest: "{{ remote_ssl_dir }}/server.crt"
+
+    - name: Zertifikate für Pterodactyl bereitstellen
+      copy:
+        remote_src: yes
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        mode: "{{ item.mode }}"
+      loop:
+        - { src: "{{ remote_ssl_dir }}/server.crt", dest: "/etc/ssl/pterodactyl/server.crt", mode: '0644' }
+        - { src: "{{ remote_ssl_dir }}/server.key", dest: "/etc/ssl/pterodactyl/server.key", mode: '0600' }
+      notify: Restart Apache
+
+    - name: Root CA verteilen
+      copy:
+        src: "{{ local_ca_dir }}/rootCA.crt"
+        dest: /usr/local/share/ca-certificates/Pterodactyl_Root_CA.crt
+      notify: Update CA Store
+
+    - name: Apache SSL Modul aktivieren
+      community.general.apache2_module:
+        name: ssl
+        state: present
+      notify: Restart Apache
+
+    - name: VHost Konfiguration verteilen
+      template:
+        src: panel-ssl.conf.j2
+        dest: /etc/apache2/sites-available/panel-ssl.conf
+      notify: Restart Apache
+
+    - name: VHost aktivieren
+      command: a2ensite panel-ssl.conf
+      args:
+        creates: /etc/apache2/sites-enabled/panel-ssl.conf
+      notify: Restart Apache
