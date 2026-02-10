@@ -142,7 +142,7 @@ Nun sollte das Panel mit https erreichbar sein. Das Zertifikat sieht wie folgt a
 
 Als Firewall lösung wird ufw (uncomplicated firewall) verwendet.
 
-~Genutzte Docs: https://wiki.ubuntuusers.de/ufw/~
+Genutzte Docs: https://wiki.ubuntuusers.de/ufw/
 
 ## Install ufw
 
